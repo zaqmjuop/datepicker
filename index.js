@@ -20,7 +20,7 @@ const getDaysCount = (year, month) => {
 };
 
 const getWeekArray = (date) => {
-  // 用数组形式表示一周 [30, 1, 2, 3, 4, 5, 6]
+  // 用数组形式表示一周，从周一开始 [30, 1, 2, 3, 4, 5, 6]
   if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
   const daysCount = getDaysCount(date.getFullYear(), date.getMonth());
   const lastMonthDaysCount = getDaysCount(date.getFullYear(), (date.getMonth() - 1));
@@ -38,6 +38,31 @@ const getWeekArray = (date) => {
   return week;
 };
 
+const getMonthArray = (date) => {
+  // 用数组形式表示一个月 [[30, 1, 2, 3, 4, 5, 6],[7,8,9,10,11,12,13], ...]
+  if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const daysCount = getDaysCount(year, month);
+  const array = [];
+  const thisWeek = getWeekArray(date);
+  array.push(thisWeek);
+  for (let i = 1; i < 6; i += 1) {
+    const pastDayNumber = date.getDate() - (i * 7);
+    if ((pastDayNumber > 0) && (pastDayNumber <= daysCount)) {
+      const pastDate = new Date(year, month, pastDayNumber);
+      const pastWeek = getWeekArray(pastDate);
+      array.unshift(pastWeek);
+    }
+    const futureDayNumber = date.getDate() + (i * 7);
+    if ((futureDayNumber > 0) && (futureDayNumber <= daysCount)) {
+      const futureDate = new Date(year, month, futureDayNumber);
+      const futureWeek = getWeekArray(futureDate);
+      array.push(futureWeek);
+    }
+  }
+  return array;
+};
 
 const initDatepicker = () => {
   const today = new Date();
@@ -67,4 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
       input.value = value;
     });
   });
+  const log = getMonthArray(new Date(2018, 4, 31));
+  console.log(log);
 });

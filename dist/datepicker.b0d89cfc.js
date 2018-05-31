@@ -121,7 +121,7 @@ var getDaysCount = function getDaysCount(year, month) {
 };
 
 var getWeekArray = function getWeekArray(date) {
-  // 用数组形式表示一周 [30, 1, 2, 3, 4, 5, 6]
+  // 用数组形式表示一周，从周一开始 [30, 1, 2, 3, 4, 5, 6]
   if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
   var daysCount = getDaysCount(date.getFullYear(), date.getMonth());
   var lastMonthDaysCount = getDaysCount(date.getFullYear(), date.getMonth() - 1);
@@ -137,6 +137,32 @@ var getWeekArray = function getWeekArray(date) {
     week.push(dateNum);
   }
   return week;
+};
+
+var getMonthArray = function getMonthArray(date) {
+  // 用数组形式表示一个月 [[30, 1, 2, 3, 4, 5, 6],[7,8,9,10,11,12,13], ...]
+  if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
+  var year = date.getFullYear();
+  var month = date.getMonth();
+  var daysCount = getDaysCount(year, month);
+  var array = [];
+  var thisWeek = getWeekArray(date);
+  array.push(thisWeek);
+  for (var i = 1; i < 6; i += 1) {
+    var pastDayNumber = date.getDate() - i * 7;
+    if (pastDayNumber > 0 && pastDayNumber <= daysCount) {
+      var pastDate = new Date(year, month, pastDayNumber);
+      var pastWeek = getWeekArray(pastDate);
+      array.unshift(pastWeek);
+    }
+    var futureDayNumber = date.getDate() + i * 7;
+    if (futureDayNumber > 0 && futureDayNumber <= daysCount) {
+      var futureDate = new Date(year, month, futureDayNumber);
+      var futureWeek = getWeekArray(futureDate);
+      array.push(futureWeek);
+    }
+  }
+  return array;
 };
 
 var initDatepicker = function initDatepicker() {
@@ -166,8 +192,10 @@ document.addEventListener('DOMContentLoaded', function () {
       input.value = value;
     });
   });
+  var log = getMonthArray(new Date(2018, 4, 31));
+  console.log(log);
 });
-},{}],6:[function(require,module,exports) {
+},{}],12:[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -196,7 +224,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '46289' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '45679' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
@@ -337,5 +365,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[6,3], null)
+},{}]},{},[12,3], null)
 //# sourceMappingURL=/datepicker.b0d89cfc.map
