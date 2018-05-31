@@ -124,15 +124,21 @@ var getWeekArray = function getWeekArray(date) {
   // 用数组形式表示一周，从周一开始 [30, 1, 2, 3, 4, 5, 6]
   if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
   var daysCount = getDaysCount(date.getFullYear(), date.getMonth());
-  var lastMonthDaysCount = getDaysCount(date.getFullYear(), date.getMonth() - 1);
+  var prevMonthObj = { year: date.getFullYear(), month: date.getMonth() - 1 };
+  if (prevMonthObj.month < 0) {
+    prevMonthObj.year -= 1;
+    prevMonthObj.month = 11;
+  }
+  var prevMonthDaysCount = getDaysCount(prevMonthObj.year, prevMonthObj.month);
   var start = date.getDate() - date.getDay() + 1;
   var week = [];
   for (var i = 0; i < 7; i += 1) {
     var dateNum = start + i;
+
     if (dateNum > daysCount) {
       dateNum -= daysCount;
     } else if (dateNum < 1) {
-      dateNum += lastMonthDaysCount;
+      dateNum += prevMonthDaysCount;
     }
     week.push(dateNum);
   }
@@ -175,16 +181,61 @@ var initDatepicker = function initDatepicker() {
   month.innerText = today.getMonth() + 1;
 };
 
+var fillDayPickerByDate = function fillDayPickerByDate(date) {
+  // 根据日期填充选择器的日期
+  if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
+  var daypicker = document.querySelector('#daypicker');
+  var monthArray = getMonthArray(date);
+  var trs = daypicker.querySelectorAll('tr');
+  document.querySelector('#year').innerText = date.getFullYear();
+  document.querySelector('#month').innerText = date.getMonth() + 1;
+  monthArray.forEach(function (weekArray, weekIndex) {
+    var trItem = trs[weekIndex];
+    var tds = trItem.querySelectorAll('td');
+    weekArray.forEach(function (day, dayIndex) {
+      var tdItem = tds[dayIndex];
+      tdItem.innerText = day;
+    });
+  });
+};
+
 document.addEventListener('DOMContentLoaded', function () {
   initDatepicker();
   var today = new Date();
+  var currentDate = today;
+  var pickerDate = today;
+  var currentPicker = {
+    year: today.getFullYear(), month: today.getMonth(), day: today.getDate()
+  };
   var input = document.querySelector('#input');
   var datepicker = document.querySelector('#datepicker');
   var picker = document.querySelector('#picker');
+  var prevMonth = document.querySelector('#prev-month');
+  var nextMonth = document.querySelector('#next-month');
   var year = document.querySelector('#year').innerText;
   var month = document.querySelector('#month').innerText;
   var daypicker = document.querySelector('#daypicker');
   var daypickerItems = daypicker.querySelectorAll('td');
+  prevMonth.addEventListener('click', function () {
+    currentPicker.day = 1;
+    currentPicker.month -= 1;
+    if (currentPicker.month < 0) {
+      currentPicker.year -= 1;
+      currentPicker.month = 11;
+    }
+    var currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+  });
+  nextMonth.addEventListener('click', function () {
+    currentPicker.day = 1;
+    currentPicker.month += 1;
+    if (currentPicker.month > 11) {
+      currentPicker.year += 1;
+      currentPicker.month = 0;
+    }
+    var currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+  });
   daypickerItems.forEach(function (item) {
     item.addEventListener('click', function () {
       var day = item.innerText;
@@ -192,10 +243,11 @@ document.addEventListener('DOMContentLoaded', function () {
       input.value = value;
     });
   });
-  var log = getMonthArray(new Date(2018, 4, 31));
-  console.log(log);
+  var log = getWeekArray(new Date(2016, 0, 1));
+  // console.log(log);
+  fillDayPickerByDate(today);
 });
-},{}],12:[function(require,module,exports) {
+},{}],23:[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -365,5 +417,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[12,3], null)
+},{}]},{},[23,3], null)
 //# sourceMappingURL=/datepicker.b0d89cfc.map

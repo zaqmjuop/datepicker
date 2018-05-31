@@ -23,15 +23,21 @@ const getWeekArray = (date) => {
   // 用数组形式表示一周，从周一开始 [30, 1, 2, 3, 4, 5, 6]
   if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
   const daysCount = getDaysCount(date.getFullYear(), date.getMonth());
-  const lastMonthDaysCount = getDaysCount(date.getFullYear(), (date.getMonth() - 1));
+  const prevMonthObj = { year: date.getFullYear(), month: (date.getMonth() - 1) };
+  if (prevMonthObj.month < 0) {
+    prevMonthObj.year -= 1;
+    prevMonthObj.month = 11;
+  }
+  const prevMonthDaysCount = getDaysCount(prevMonthObj.year, prevMonthObj.month);
   const start = (date.getDate() - date.getDay()) + 1;
   const week = [];
   for (let i = 0; i < 7; i += 1) {
     let dateNum = start + i;
+
     if (dateNum > daysCount) {
       dateNum -= daysCount;
     } else if (dateNum < 1) {
-      dateNum += lastMonthDaysCount;
+      dateNum += prevMonthDaysCount;
     }
     week.push(dateNum);
   }
@@ -74,17 +80,61 @@ const initDatepicker = () => {
   month.innerText = today.getMonth() + 1;
 };
 
+const fillDayPickerByDate = (date) => {
+  // 根据日期填充选择器的日期
+  if (!(date instanceof Date)) throw new TypeError('param date should be a instance of Date');
+  const daypicker = document.querySelector('#daypicker');
+  const monthArray = getMonthArray(date);
+  const trs = daypicker.querySelectorAll('tr');
+  document.querySelector('#year').innerText = date.getFullYear();
+  document.querySelector('#month').innerText = (date.getMonth() + 1);
+  monthArray.forEach((weekArray, weekIndex) => {
+    const trItem = trs[weekIndex];
+    const tds = trItem.querySelectorAll('td');
+    weekArray.forEach((day, dayIndex) => {
+      const tdItem = tds[dayIndex];
+      tdItem.innerText = day;
+    });
+  });
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   initDatepicker();
   const today = new Date();
+  let currentDate = today;
+  let pickerDate = today;
+  const currentPicker = {
+    year: today.getFullYear(), month: today.getMonth(), day: today.getDate(),
+  };
   const input = document.querySelector('#input');
   const datepicker = document.querySelector('#datepicker');
   const picker = document.querySelector('#picker');
+  const prevMonth = document.querySelector('#prev-month');
+  const nextMonth = document.querySelector('#next-month');
   const year = document.querySelector('#year').innerText;
   const month = document.querySelector('#month').innerText;
   const daypicker = document.querySelector('#daypicker');
   const daypickerItems = daypicker.querySelectorAll('td');
+  prevMonth.addEventListener('click', () => {
+    currentPicker.day = 1;
+    currentPicker.month -= 1;
+    if (currentPicker.month < 0) {
+      currentPicker.year -= 1;
+      currentPicker.month = 11;
+    }
+    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+  });
+  nextMonth.addEventListener('click', () => {
+    currentPicker.day = 1;
+    currentPicker.month += 1;
+    if (currentPicker.month > 11) {
+      currentPicker.year += 1;
+      currentPicker.month = 0;
+    }
+    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+  });
   daypickerItems.forEach((item) => {
     item.addEventListener('click', () => {
       const day = item.innerText;
@@ -92,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
       input.value = value;
     });
   });
-  const log = getMonthArray(new Date(2018, 4, 31));
-  console.log(log);
+  const log = getWeekArray(new Date(2016, 0, 1));
+  // console.log(log);
+  fillDayPickerByDate(today);
 });
