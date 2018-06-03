@@ -10,24 +10,29 @@
 </head>
 
 <body>
+  <br>
   <input type="text" value="选择时间" id="input">
-  <div class="datepicker" id="datepicker">
+  <br><br><br><br><br><br><br><br>
+  <div class="datepicker hide" id="datepicker">
     <table border="1" id="picker">
       <thead>
         <tr>
+          <th id="prev-year">←</th>
+          <th id="year" colspan="2"></th>
+          <th id="next-year">→</th>
           <th id="prev-month">←</th>
-          <th id="year" colspan="3"></th>
-          <th id="month" colspan="2"></th>
+          
+          <th id="month"></th>
           <th id="next-month">→</th>
         </tr>
         <tr>
+          <th>日</th>
           <th>一</th>
           <th>二</th>
           <th>三</th>
           <th>四</th>
           <th>五</th>
-          <th>六</th>
-          <th>日</th>
+          <th>六</th>          
         </tr>
       </thead>
       <tbody id="daypicker">

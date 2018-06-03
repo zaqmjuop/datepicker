@@ -1,15 +1,4 @@
-/* .datepicker,.datepicker *{
-  box-sizing: border-box;
-}
-.datepicker .output{
-  border-radius: 3px;
-  border: 1px solid #ddd;
-  display: inline-block;
-  padding: 5px 8px;
-  cursor: pointer;
-  box-shadow: 0 0 3px #eee;
-  background: radial-gradient(#eee, #ddd, #ccc);
-} */
+
 table{
   border-collapse: collapse;
 }
@@ -18,4 +7,10 @@ table{
 }
 .hide{
   display: none;
+}
+.prev-month,.next-month{
+  color: #999;
+}
+#current-picker{
+  background-color: blue;
 }

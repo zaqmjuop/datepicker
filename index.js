@@ -1,4 +1,21 @@
 
+const getParentElements = (element) => {
+  if (!element || (element.nodeType !== 1)) return undefined;
+  const result = [];
+  let parent = element;
+  for (let i = 0; i < 999; i += 1) {
+    if (parent) {
+      parent = parent.parentElement;
+      if (parent && (parent.nodeType === 1)) {
+        result.push(parent);
+      }
+    } else {
+      break;
+    }
+  }
+  return result;
+};
+
 const defaultMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const getMonths = (yearNumber) => {
@@ -29,11 +46,10 @@ const getWeekArray = (date) => {
     prevMonthObj.month = 11;
   }
   const prevMonthDaysCount = getDaysCount(prevMonthObj.year, prevMonthObj.month);
-  const start = (date.getDate() - date.getDay()) + 1;
+  const start = date.getDate() - date.getDay();
   const week = [];
   for (let i = 0; i < 7; i += 1) {
     let dateNum = start + i;
-
     if (dateNum > daysCount) {
       dateNum -= daysCount;
     } else if (dateNum < 1) {
@@ -53,18 +69,18 @@ const getMonthArray = (date) => {
   const array = [];
   const thisWeek = getWeekArray(date);
   array.push(thisWeek);
-  for (let i = 1; i < 6; i += 1) {
-    const pastDayNumber = date.getDate() - (i * 7);
-    if ((pastDayNumber > 0) && (pastDayNumber <= daysCount)) {
-      const pastDate = new Date(year, month, pastDayNumber);
-      const pastWeek = getWeekArray(pastDate);
-      array.unshift(pastWeek);
+  for (let i = 0; i < 5; i += 1) {
+    const prevSaturdayDate = (date.getDate() - date.getDay()) - 1 - (i * 7);
+    if (prevSaturdayDate > 0) {
+      const prevSaturday = new Date(date.getFullYear(), date.getMonth(), prevSaturdayDate);
+      const prevWeek = getWeekArray(prevSaturday);
+      array.unshift(prevWeek);
     }
-    const futureDayNumber = date.getDate() + (i * 7);
-    if ((futureDayNumber > 0) && (futureDayNumber <= daysCount)) {
-      const futureDate = new Date(year, month, futureDayNumber);
-      const futureWeek = getWeekArray(futureDate);
-      array.push(futureWeek);
+    const nextSundayDate = (date.getDate() - date.getDay()) + 7 + (i * 7);
+    if (nextSundayDate <= daysCount) {
+      const nextSunday = new Date(date.getFullYear(), date.getMonth(), nextSundayDate);
+      const nextWeek = getWeekArray(nextSunday);
+      array.push(nextWeek);
     }
   }
   return array;
@@ -88,12 +104,28 @@ const fillDayPickerByDate = (date) => {
   const trs = daypicker.querySelectorAll('tr');
   document.querySelector('#year').innerText = date.getFullYear();
   document.querySelector('#month').innerText = (date.getMonth() + 1);
+  if (monthArray.length === 5) {
+    monthArray.push(['', '', '', '', '', '', '']);
+  }
   monthArray.forEach((weekArray, weekIndex) => {
     const trItem = trs[weekIndex];
     const tds = trItem.querySelectorAll('td');
     weekArray.forEach((day, dayIndex) => {
       const tdItem = tds[dayIndex];
       tdItem.innerText = day;
+      if (weekIndex === 0) {
+        if (Number(day) > 7) {
+          tdItem.classList.add('prev-month');
+        } else {
+          tdItem.classList.remove('prev-month');
+        }
+      } else if (weekIndex >= (monthArray.length - 2)) {
+        if (Number(day) < 7) {
+          tdItem.classList.add('next-month');
+        } else {
+          tdItem.classList.remove('next-month');
+        }
+      }
     });
   });
 };
@@ -109,12 +141,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const input = document.querySelector('#input');
   const datepicker = document.querySelector('#datepicker');
   const picker = document.querySelector('#picker');
+  const prevYear = document.querySelector('#prev-year');
+  const nextYear = document.querySelector('#next-year');
   const prevMonth = document.querySelector('#prev-month');
   const nextMonth = document.querySelector('#next-month');
   const year = document.querySelector('#year').innerText;
   const month = document.querySelector('#month').innerText;
   const daypicker = document.querySelector('#daypicker');
   const daypickerItems = daypicker.querySelectorAll('td');
+  prevYear.addEventListener('click', () => {
+    if ((currentPicker.year < 1) || (currentPicker.year > 9998)) return false;
+    currentPicker.year -= 1;
+    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+    return 1;
+  });
+  nextYear.addEventListener('click', () => {
+    if ((currentPicker.year < 1) || (currentPicker.year > 9998)) return false;
+    currentPicker.year += 1;
+    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(currentPickerDate);
+    return 1;
+  });
   prevMonth.addEventListener('click', () => {
     currentPicker.day = 1;
     currentPicker.month -= 1;
@@ -140,9 +188,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const day = item.innerText;
       const value = `${year}-${month}-${day}`;
       input.value = value;
+      daypickerItems.forEach(td => td.setAttribute('id', ''));
+      item.setAttribute('id', 'current-picker');
     });
   });
-  const log = getWeekArray(new Date(2016, 0, 1));
-  // console.log(log);
+  input.addEventListener('mousedown', (event) => {
+    event.stopPropagation();
+    datepicker.classList.remove('hide');
+    const topSpace = window.scrollY - input.offsetTop;
+    const bottomSpace = window.innerHeight - input.offsetHeight - topSpace;
+    if ((bottomSpace < datepicker.offsetHeight) && (topSpace >= datepicker.offsetHeight)) {
+      datepicker.style.top = '0px';
+      datepicker.style.bottom = `${(bottomSpace - datepicker.offsetHeight)}px`;
+    } else {
+      datepicker.style.top = `${(topSpace - datepicker.offsetHeight)}px`;
+      datepicker.style.bottom = '0px';
+    }
+  });
+  document.body.addEventListener('mousedown', (e) => {
+    const touchElement = e.target;
+    const parents = getParentElements(touchElement);
+    let isTouchingDatepicker = false;
+    parents.forEach((parent) => {
+      if (datepicker.isSameNode(parent)) {
+        isTouchingDatepicker = true;
+      }
+    });
+    if (!isTouchingDatepicker) {
+      datepicker.classList.add('hide');
+    }
+  });
   fillDayPickerByDate(today);
 });
