@@ -18,6 +18,12 @@ const getParentElements = (element) => {
 
 const defaultMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+const today = new Date();
+
+const currentPicker = {
+  year: today.getFullYear(), month: today.getMonth(), day: today.getDate(),
+};
+
 const getMonths = (yearNumber) => {
   // 用一个数组表示某一年的12月每月有多少天
   if (!Number.isSafeInteger(yearNumber)) throw new TypeError('param should be a year number, and type is integer');
@@ -87,9 +93,6 @@ const getMonthArray = (date) => {
 };
 
 const initDatepicker = () => {
-  const today = new Date();
-  const datepicker = document.querySelector('#datepicker');
-  const picker = document.querySelector('#picker');
   const year = document.querySelector('#year');
   const month = document.querySelector('#month');
   year.innerText = today.getFullYear();
@@ -105,7 +108,9 @@ const fillDayPickerByDate = (date) => {
   document.querySelector('#year').innerText = date.getFullYear();
   document.querySelector('#month').innerText = (date.getMonth() + 1);
   if (monthArray.length === 5) {
-    monthArray.push(['', '', '', '', '', '', '']);
+    const nextMonth7 = new Date(date.getFullYear(), (date.getMonth() + 1), 6);
+    const nextMonthFirstWeek = getWeekArray(nextMonth7);
+    monthArray.push(nextMonthFirstWeek);
   }
   monthArray.forEach((weekArray, weekIndex) => {
     const trItem = trs[weekIndex];
@@ -120,11 +125,16 @@ const fillDayPickerByDate = (date) => {
           tdItem.classList.remove('prev-month');
         }
       } else if (weekIndex >= (monthArray.length - 2)) {
-        if (Number(day) < 7) {
+        if (Number(day) < 15) {
           tdItem.classList.add('next-month');
         } else {
           tdItem.classList.remove('next-month');
         }
+      }
+      if ((currentPicker.day === day) && (!tdItem.classList.contains('prev-month')) && (!tdItem.classList.contains('next-month'))) {
+        const pastPikcer = document.querySelector('#current-picker');
+        if (pastPikcer) pastPikcer.setAttribute('id', '');
+        tdItem.setAttribute('id', 'current-picker');
       }
     });
   });
@@ -132,77 +142,86 @@ const fillDayPickerByDate = (date) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   initDatepicker();
-  const today = new Date();
-  let currentDate = today;
-  let pickerDate = today;
-  const currentPicker = {
-    year: today.getFullYear(), month: today.getMonth(), day: today.getDate(),
-  };
   const input = document.querySelector('#input');
   const datepicker = document.querySelector('#datepicker');
-  const picker = document.querySelector('#picker');
   const prevYear = document.querySelector('#prev-year');
   const nextYear = document.querySelector('#next-year');
   const prevMonth = document.querySelector('#prev-month');
   const nextMonth = document.querySelector('#next-month');
-  const year = document.querySelector('#year').innerText;
-  const month = document.querySelector('#month').innerText;
+  const year = document.querySelector('#year');
+  const month = document.querySelector('#month');
   const daypicker = document.querySelector('#daypicker');
   const daypickerItems = daypicker.querySelectorAll('td');
   prevYear.addEventListener('click', () => {
     if ((currentPicker.year < 1) || (currentPicker.year > 9998)) return false;
     currentPicker.year -= 1;
-    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
-    fillDayPickerByDate(currentPickerDate);
+    const byDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(byDate);
     return 1;
   });
   nextYear.addEventListener('click', () => {
     if ((currentPicker.year < 1) || (currentPicker.year > 9998)) return false;
     currentPicker.year += 1;
-    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
-    fillDayPickerByDate(currentPickerDate);
+    const byDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(byDate);
     return 1;
   });
   prevMonth.addEventListener('click', () => {
-    currentPicker.day = 1;
     currentPicker.month -= 1;
     if (currentPicker.month < 0) {
       currentPicker.year -= 1;
       currentPicker.month = 11;
     }
-    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
-    fillDayPickerByDate(currentPickerDate);
+    const byDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(byDate);
   });
   nextMonth.addEventListener('click', () => {
-    currentPicker.day = 1;
     currentPicker.month += 1;
     if (currentPicker.month > 11) {
       currentPicker.year += 1;
       currentPicker.month = 0;
     }
-    const currentPickerDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
-    fillDayPickerByDate(currentPickerDate);
+    const byDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(byDate);
   });
   daypickerItems.forEach((item) => {
     item.addEventListener('click', () => {
-      const day = item.innerText;
-      const value = `${year}-${month}-${day}`;
-      input.value = value;
-      daypickerItems.forEach(td => td.setAttribute('id', ''));
+      const pastPikcer = document.querySelector('#current-picker');
+      currentPicker.year = Number(year.innerText);
+      currentPicker.month = Number(month.innerText) - 1;
+      currentPicker.day = Number(item.innerText);
+      if (item.classList.contains('prev-month')) {
+        currentPicker.month -= 1;
+        if (currentPicker.month < 0) {
+          currentPicker.year -= 1;
+          currentPicker.month = 11;
+        }
+      } else if (item.classList.contains('next-month')) {
+        currentPicker.month += 1;
+        if (currentPicker.month > 11) {
+          currentPicker.year += 1;
+          currentPicker.month = 0;
+        }
+      }
+      if (pastPikcer) pastPikcer.setAttribute('id', '');
+      input.value = `${currentPicker.year}-${currentPicker.month + 1}-${currentPicker.day}`;
       item.setAttribute('id', 'current-picker');
+      datepicker.classList.add('hide');
     });
   });
   input.addEventListener('mousedown', (event) => {
     event.stopPropagation();
     datepicker.classList.remove('hide');
-    const topSpace = window.scrollY - input.offsetTop;
+    const topSpace = input.offsetTop - window.scrollY;
     const bottomSpace = window.innerHeight - input.offsetHeight - topSpace;
-    if ((bottomSpace < datepicker.offsetHeight) && (topSpace >= datepicker.offsetHeight)) {
-      datepicker.style.top = '0px';
-      datepicker.style.bottom = `${(bottomSpace - datepicker.offsetHeight)}px`;
+    const byDate = new Date(currentPicker.year, currentPicker.month, currentPicker.day);
+    fillDayPickerByDate(byDate);
+    if ((topSpace > datepicker.offsetHeight) && (bottomSpace < datepicker.offsetHeight)) {
+      datepicker.style.top = '';
+      datepicker.style.bottom = `${(bottomSpace + input.offsetHeight)}px`;
     } else {
-      datepicker.style.top = `${(topSpace - datepicker.offsetHeight)}px`;
-      datepicker.style.bottom = '0px';
+      datepicker.style.top = `${(input.offsetTop + input.offsetHeight)}px`;
+      datepicker.style.bottom = '';
     }
   });
   document.body.addEventListener('mousedown', (e) => {
@@ -218,5 +237,4 @@ document.addEventListener('DOMContentLoaded', () => {
       datepicker.classList.add('hide');
     }
   });
-  fillDayPickerByDate(today);
 });
