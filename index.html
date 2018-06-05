@@ -21,25 +21,30 @@
   <input type="text" value="选择时间" id="input">
   <br><br><br><br><br><br><br><br>
   <div class="datepicker hide" id="datepicker">
-    <table border="1" id="picker">
+    <table border="1"  cellspacing="2" id="picker">
       <thead>
         <tr>
-          <th id="prev-year">←</th>
-          <th id="year" colspan="2"></th>
-          <th id="next-year">→</th>
-          <th id="prev-month">←</th>
+          <th id="prev-month">◂</th>
+          <!-- <th id="prev-month">←</th> -->
+          <!-- <th id="prev-year">←</th> -->
+          <th></th>
+          <th colspan="2"><input id="year" type="number"></th>
+          <!-- <th id="next-year">→</th> -->
+          <th colspan="2" id="month"></th>
+          <th id="next-month">▸</th>
           
-          <th id="month"></th>
-          <th id="next-month">→</th>
+          
+          <!-- <th id="month"></th>
+          <th id="next-month">→</th> -->
         </tr>
-        <tr>
-          <th>日</th>
+        <tr class="week-sign">
+          <th class="text-red">日</th>
           <th>一</th>
           <th>二</th>
           <th>三</th>
           <th>四</th>
           <th>五</th>
-          <th>六</th>          
+          <th class="text-red">六</th>          
         </tr>
       </thead>
       <tbody id="daypicker">
