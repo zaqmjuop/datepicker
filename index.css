@@ -71,6 +71,9 @@
   background-color: #eee;
   border: 1px solid #000;
 }
+.month::after{
+  content: "月";
+}
 .arrow-top:before, .arrow-top:after,.arrow-bottom:before, .arrow-bottom:after{
   content:"";
   position: absolute;
