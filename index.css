@@ -16,6 +16,20 @@
   z-index: 99999;
   background-color: #fff;
 }
+.reel{
+  animation:reel 0.2s ease-in-out;
+  animation-fill-mode: forwards;
+}
+@keyframes reel{
+  0% {
+    max-height: 10px;
+    overflow: hidden;
+  }
+  100%{
+    max-height: 999px;
+    overflow: visible;
+  }
+}
 .hide{
   display: none;
 }
@@ -56,4 +70,44 @@
 .year:hover{
   background-color: #eee;
   border: 1px solid #000;
+}
+.arrow-top:before, .arrow-top:after,.arrow-bottom:before, .arrow-bottom:after{
+  content:"";
+  position: absolute;
+  display: block;
+  left: 20px;
+  width: 0px;
+  height: 0px;
+}
+.arrow-top{
+  transform: translateY(3px);
+}
+.arrow-top:before, .arrow-top:after{
+  border-top: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.arrow-top:before{
+  border-bottom:5px solid #000;
+  top: -6px;
+}
+.arrow-top:after{
+  border-bottom:5px solid #fff;
+  top: -5px;
+}
+.arrow-bottom{
+  transform: translateY(-3px);
+}
+.arrow-bottom:before, .arrow-bottom:after{
+  border-bottom: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.arrow-bottom:before{
+  border-top:5px solid #000;
+  bottom: -6px;
+}
+.arrow-bottom:after{
+  border-top:5px solid #fff;
+  bottom: -5px;
 }

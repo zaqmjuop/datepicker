@@ -206,7 +206,7 @@ class Picker {
       datepickers.forEach((picker) => {
         if (!this.body.isSameNode(picker)) picker.classList.add('hide');
       });
-      this.body.classList.remove('hide'); // 先显示才有宽高
+      dom.of(this.body).removeClass('arrow-top arrow-bottom reel hide'); // 先显示才有宽高
       const topSpace = this.input.offsetTop;
       const topSeen = topSpace - window.scrollY;
       const toSeenBottomHeight = window.scrollY + window.innerHeight;
@@ -217,10 +217,13 @@ class Picker {
       let top;
       if (!isBottomSeenEnough && isTopSeenEnough) {
         top = topSpace - this.body.offsetHeight;// 选择器在输入框上方
+        dom.of(this.body).addClass('arrow-bottom');
       } else {
         top = topSpace + this.input.offsetHeight; // 选择器在输入框下方
+        dom.of(this.body).addClass('arrow-top');
       }
       this.fillDayPickerByCurrent();
+      dom.of(this.body).addClass('reel');
       this.body.style.top = `${top}px`;
     });
     return this;
