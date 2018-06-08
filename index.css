@@ -5,18 +5,25 @@
   color: #c66;
 }
 .datepicker{
-  display: block;
+  display: inline-block;
   position: absolute;
   padding: 3px;
   border-radius: 3px;
   border: 1px solid #000;
   box-shadow: 0px 0px 5px #888;
+  user-select: none;
+  opacity: 1;
+  z-index: 99999;
+  background-color: #fff;
 }
 .hide{
   display: none;
 }
-#prev-month,#next-month{
+.datepicker thead .prev-month, .datepicker thead .next-month{
   color: #3388FF;
+}
+.datepicker tbody .prev-month, .datepicker tbody .next-month{
+  color: #999;
 }
 .datepicker table,.datepicker th{
   border: none;
@@ -37,10 +44,7 @@
   background-color:#006DB6;
   color: #fff;
 }
-#prev-year, #next-year,#prev-month,#next-month{
-  cursor: pointer;
-}
-#year{
+.year{
   width: 4em;
   height: 100%;
   text-align: center;
@@ -49,7 +53,7 @@
   border: 1px solid transparent;
   outline: none;
 }
-#year:hover{
+.year:hover{
   background-color: #eee;
   border: 1px solid #000;
 }
