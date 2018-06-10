@@ -1,18 +1,31 @@
 {
   "name": "datepicker",
-  "version": "1.0.0",
-  "description": "一个基于原生浏览器环境的时间选择器，用来代替原生的时间选择器",
+  "version": "1.0.1",
+  "description": "简单的事件选择器",
   "main": "index.js",
+  "style": "*.css",
+  "engines": {
+    "node": ">=8.11.1",
+    "npm": ">=6.0.1"
+  },
+  "directories": {
+    "lib": "src",
+    "doc": "src"
+  },
+  "author": {
+    "name": "Bochao Zhu",
+    "email": "1060007045@qq.com"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel index.html -p 4000"
+    "dev": "parcel index.html -p 4000",
+    "install": "node install.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zaqmjuop/datepicker.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/zaqmjuop/datepicker/issues"
