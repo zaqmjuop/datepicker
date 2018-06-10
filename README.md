@@ -1,4 +1,5 @@
 一个简单的时间选择器插件
+[预览](https://zaqmjuop.github.io/datepicker/)
 
 ![face-preview](./readme-pic.png)
 
