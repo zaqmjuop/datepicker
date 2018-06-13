@@ -4,7 +4,71 @@ import CustomDate from './customDate';
 let isbindTurnOff = 0;
 let isWindowResize = 0;
 
+const getFixedTop = (element) => {
+  // 相对body的top
+  if (!dom.isElement(element)) throw new TypeError('参数应是HTML Element');
+  const parents = dom.of(element).parents();
+  let result = element.offsetTop;
+  for (let i = 0; i < parents.length; i += 1) {
+    const parent = parents[i];
+    if (dom.isElement(parent)) {
+      if ((parent.tagName === 'BODY') && (parent.tagName === 'HTML')) break;
+      result += parent.offsetTop;
+      if (parent.offsetParent === document.body) break;
+    }
+  }
+  return result;
+};
+
+const getFixedLeft = (element) => {
+  // 相对body的top
+  if (!dom.isElement(element)) throw new TypeError('参数应是HTML Element');
+  const parents = dom.of(element).parents();
+  let result = element.offsetLeft;
+  for (let i = 0; i < parents.length; i += 1) {
+    const parent = parents[i];
+    if (dom.isElement(parent)) {
+      if ((parent.tagName === 'BODY') && (parent.tagName === 'HTML')) break;
+      result += parent.offsetLeft;
+      if (parent.offsetParent === document.body) break;
+    }
+  }
+  return result;
+};
+
+const getResponsiveTop = (element, reference) => {
+  // 或许响应式的top，如果下方空间不够且上方空间够则在上方，否则在下方
+  if (!dom.isElement(element) || !dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
+  const topSpace = getFixedTop(reference);
+  const topSeen = topSpace - window.scrollY;
+  const toSeenBottomHeight = window.scrollY + window.innerHeight;
+  const toInputBottomHeight = topSpace + reference.offsetHeight;
+  const bottomSeen = toSeenBottomHeight - toInputBottomHeight;
+  const isBottomSeenEnough = bottomSeen > element.offsetHeight;
+  const isTopSeenEnough = topSeen > element.offsetHeight;
+  let top;
+  if (!isBottomSeenEnough && isTopSeenEnough) {
+    top = topSpace - element.offsetHeight;// 在参照元素上方
+  } else {
+    top = topSpace + reference.offsetHeight; // 在参照元素下方
+  }
+  return top;
+};
+
+const getResponsiveLeft = (element, reference) => {
+  // 或许响应式的left，一般时对齐左边线，只有右侧空间不足时右边线对齐
+  if (!dom.isElement(element) || !dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
+  const leftSpace = getFixedLeft(reference);
+  const rightSpace = document.body.offsetWidth - reference.offsetWidth - leftSpace;
+  const isRightEnough = (rightSpace + reference.offsetWidth) > element.offsetWidth;
+  const left = (isRightEnough)
+    ? leftSpace
+    : ((leftSpace + reference.offsetWidth) - element.offsetWidth);
+  return left;
+};
+
 const bindWindowResize = () => {
+  // 窗口大小改变时 修改body的min-height
   if (isWindowResize) return false;
   isWindowResize += 1;
   const resizeBodyMinHeight = () => {
@@ -202,29 +266,21 @@ class Picker {
     // 点击输入框打开日期选择器
     this.input.addEventListener('mousedown', (event) => {
       event.stopPropagation();
+      dom.of(this.body).removeClass('arrow-top arrow-bottom reel hide'); // 先显示才有宽高
       const datepickers = document.querySelectorAll('.datepicker');
+      const topSpace = getFixedTop(this.input);
+      const leftSpace = getFixedLeft(this.input);
+      const top = getResponsiveTop(this.body, this.input);
+      const left = getResponsiveLeft(this.body, this.input);
+      const yclass = (top < topSpace) ? 'arrow-bottom' : 'arrow-top';
+      const xclass = (left < leftSpace) ? 'pseudo-right' : '';
       datepickers.forEach((picker) => {
         if (!this.body.isSameNode(picker)) picker.classList.add('hide');
       });
-      dom.of(this.body).removeClass('arrow-top arrow-bottom reel hide'); // 先显示才有宽高
-      const topSpace = this.input.offsetTop;
-      const topSeen = topSpace - window.scrollY;
-      const toSeenBottomHeight = window.scrollY + window.innerHeight;
-      const toInputBottomHeight = this.input.offsetTop + this.input.offsetHeight;
-      const bottomSeen = toSeenBottomHeight - toInputBottomHeight;
-      const isBottomSeenEnough = bottomSeen > this.body.offsetHeight;
-      const isTopSeenEnough = topSeen > this.body.offsetHeight;
-      let top;
-      if (!isBottomSeenEnough && isTopSeenEnough) {
-        top = topSpace - this.body.offsetHeight;// 选择器在输入框上方
-        dom.of(this.body).addClass('arrow-bottom');
-      } else {
-        top = topSpace + this.input.offsetHeight; // 选择器在输入框下方
-        dom.of(this.body).addClass('arrow-top');
-      }
       this.fillDayPickerByCurrent();
-      dom.of(this.body).addClass('reel');
+      dom.of(this.body).addClass(`reel ${yclass} ${xclass}`);
       this.body.style.top = `${top}px`;
+      this.body.style.left = `${left}px`;
     });
     return this;
   }

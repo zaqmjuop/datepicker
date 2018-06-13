@@ -114,3 +114,7 @@
   border-top:5px solid #fff;
   bottom: -5px;
 }
+.pseudo-right::before, .pseudo-right::after{
+  right: 20px;
+  left: auto;
+}

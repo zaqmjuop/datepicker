@@ -1,4 +1,4 @@
-import toPicker from './src/datepicker';
+import toPicker from './datepicker';
 
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.querySelector('#input');
