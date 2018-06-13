@@ -66,19 +66,28 @@ class Dom {
   addClass(content) {
     if (!content || (typeof content !== 'string')) throw new TypeError('参数应该是字符串');
     const ary = content.split(' ');
-    ary.forEach(value => this.dom.classList.add(value));
+    ary.forEach((value) => {
+      if (value) {
+        this.dom.classList.add(value);
+      }
+    });
     return this;
   }
 
   removeClass(content) {
     if (!content || (typeof content !== 'string')) throw new TypeError('参数应该是字符串');
     const ary = content.split(' ');
-    ary.forEach(value => this.dom.classList.remove(value));
+    ary.forEach((value) => {
+      if (value) {
+        this.dom.classList.remove(value);
+      }
+    });
     return this;
   }
 
   hasClass(content) {
     if (!content || (typeof content !== 'string')) throw new TypeError('参数应该是字符串');
+    if (content.match(' ')) throw new TypeError('参数不能含有空格');
     return this.dom.classList.contains(content);
   }
 

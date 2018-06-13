@@ -7,15 +7,13 @@ let isWindowResize = 0;
 const getFixedTop = (element) => {
   // 相对body的top
   if (!dom.isElement(element)) throw new TypeError('参数应是HTML Element');
-  const parents = dom.of(element).parents();
   let result = element.offsetTop;
-  for (let i = 0; i < parents.length; i += 1) {
-    const parent = parents[i];
-    if (dom.isElement(parent)) {
-      if ((parent.tagName === 'BODY') && (parent.tagName === 'HTML')) break;
-      result += parent.offsetTop;
-      if (parent.offsetParent === document.body) break;
-    }
+  let parent = element;
+  for (let i = 0; i < 999; i += 1) {
+    parent = parent.offsetParent;
+    if (parent === document.body) break;
+    const top = parent.offsetTop;
+    result += top;
   }
   return result;
 };
