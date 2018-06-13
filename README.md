@@ -6,12 +6,12 @@
 ### [下载](https://github.com/zaqmjuop/datepicker/releases/download/1.0.1/build.zip)
 
 ```html
-<link rel="stylesheet" href="datepicker.min.css">
-<script src="datepicker.min.js"></script>
+<link rel="stylesheet" href="datepicker.css">
+<script src="datepicker.js"></script>
 ```
 
 ```javascript
-import datepicker from 'datepicker.min.js';
+import datepicker from './datepicker.js';
 
 
 const input = document.querySelector('#input');
