@@ -1,7 +1,7 @@
 一个简单的时间选择器插件
 [预览](https://zaqmjuop.github.io/datepicker/)
 
-![face-preview](./src/readme-pic.png)
+![face-preview](./src/readme.png)
 
 ### [下载](https://github.com/zaqmjuop/datepicker/releases/download/1.0.1/build.zip)
 
