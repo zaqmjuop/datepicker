@@ -18,8 +18,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel index.html -p 4000",
-    "install": "node install.js"
+    "dev": "parcel dev.html -p 4000",
+    "install": "node install.js",
+    "build": "parcel build src/datepicker.js -d build && parcel build src/datepicker.css -d build"
   },
   "repository": {
     "type": "git",

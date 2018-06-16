@@ -328,4 +328,5 @@ const toPicker = (input) => {
   return result;
 };
 
+window.datepicker = toPicker;
 export default toPicker;

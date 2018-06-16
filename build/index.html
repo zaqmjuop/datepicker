@@ -10,11 +10,19 @@
 </head>
 
 <body>
-  <br><br><br><br><br><br><br><br><br>
-  <span>asdasdasdsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss</span>
-  <input type="text" value="选择时间" id="input">
-  <br><br><br><br><br><br><br><br><br>
-  <script src="./index.js"></script>
+  <div>
+    <h1>日期选择器</h1>
+    <div>
+      <input type="text" value="选择时间" id="input">
+    </div>
+  </div>
+  <script src="./datepicker.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      var input = document.querySelector('#input');
+      window.datepicker(input);
+    });
+  </script>
 </body>
 
 </html>
