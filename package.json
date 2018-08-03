@@ -1,6 +1,6 @@
 {
   "name": "datepicker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "简单的事件选择器",
   "main": "index.js",
   "style": "*.css",
@@ -13,7 +13,7 @@
     "doc": "src"
   },
   "author": {
-    "name": "Bochao Zhu",
+    "name": "zaqmjuop",
     "email": "1060007045@qq.com"
   },
   "scripts": {
@@ -35,6 +35,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "cssnano": "^4.0.5",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.12.0"

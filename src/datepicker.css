@@ -1,10 +1,5 @@
-*{
-  box-sizing: border-box;
-}
-.text-red{
-  color: #c66;
-}
 .datepicker{
+  box-sizing: border-box;
   display: inline-block;
   position: absolute;
   padding: 3px;
@@ -15,6 +10,12 @@
   opacity: 1;
   z-index: 99999;
   background-color: #fff;
+}
+.datepicker *{
+  box-sizing: border-box;
+}
+.datepicker .text-red{
+  color: #c66;
 }
 .reel{
   animation:reel 0.2s ease-in-out;
@@ -58,7 +59,7 @@
   background-color:#006DB6;
   color: #fff;
 }
-.year{
+.datepicker .year{
   width: 4em;
   height: 100%;
   text-align: center;
@@ -67,11 +68,11 @@
   border: 1px solid transparent;
   outline: none;
 }
-.year:hover{
+.datepicker .year:hover{
   background-color: #eee;
   border: 1px solid #000;
 }
-.month::after{
+.datepicker .month::after{
   content: "月";
 }
 .arrow-top:before, .arrow-top:after,.arrow-bottom:before, .arrow-bottom:after{

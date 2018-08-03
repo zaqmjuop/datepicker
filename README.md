@@ -7,8 +7,8 @@
 
 #### 引用文件
 ```html
-<link rel="stylesheet" href="datepicker.css">
-<script src="datepicker.js"></script>
+<link rel="stylesheet" href="https://zaqmjuop.github.io/datepicker/build/datepicker.css">
+<script src="https://zaqmjuop.github.io/datepicker/build/datepicker.js"></script>
 ```
 #### 将一个文本输入框元素变成日期选择器
 ```html

@@ -1,43 +1,80 @@
-import dom from './dom';
+import Dom from './dom';
 import CustomDate from './customDate';
 
 let isbindTurnOff = 0;
 let isWindowResize = 0;
+const absolute = { x: 0, y: 0 };
 
-const getFixedTop = (element) => {
-  // 相对body的top
-  if (!dom.isElement(element)) throw new TypeError('参数应是HTML Element');
-  let result = element.offsetTop;
-  let parent = element;
-  for (let i = 0; i < 999; i += 1) {
-    parent = parent.offsetParent;
-    if (parent === document.body) break;
-    const top = parent.offsetTop;
-    result += top;
+const getFixedLeft = (element) => {
+  // 相对screen的left
+  if (!Dom.isElement(element)) throw new TypeError('参数应是HTML Element');
+  let result = 0;
+  let isFixed = false;
+  let scrollLeft = 0;
+  const parents = Dom.of(element).parents();
+  let fixParents = [];
+  // 若父元素存在position === 'fixed' 计算并减去scrollLeft
+  for (let index = parents.length - 1; index > -1; index -= 1) {
+    const parent = parents[index];
+    if (Dom.of(parent).css('position') === 'fixed') {
+      isFixed = true;
+      fixParents = parents.slice(0, index);
+      break;
+    }
   }
+  if (isFixed) {
+    fixParents.forEach((fixParent) => {
+      scrollLeft += fixParent.scrollLeft;
+    });
+  }
+  // offsetLeft
+  let offsetElement = element;
+  let offsetLeft = 0;
+  while (Dom.isElement(offsetElement) && offsetElement.tagName !== 'body' && offsetElement.tagName !== 'html') {
+    offsetLeft += offsetElement.offsetLeft;
+    offsetElement = offsetElement.offsetParent;
+  }
+  result = offsetLeft - scrollLeft;
   return result;
 };
 
-const getFixedLeft = (element) => {
-  // 相对body的top
-  if (!dom.isElement(element)) throw new TypeError('参数应是HTML Element');
-  const parents = dom.of(element).parents();
-  let result = element.offsetLeft;
-  for (let i = 0; i < parents.length; i += 1) {
-    const parent = parents[i];
-    if (dom.isElement(parent)) {
-      if ((parent.tagName === 'BODY') && (parent.tagName === 'HTML')) break;
-      result += parent.offsetLeft;
-      if (parent.offsetParent === document.body) break;
+const getFixedTop = (element) => {
+  // 相对screen的top
+  if (!Dom.isElement(element)) throw new TypeError('参数应是HTML Element');
+  let result = 0;
+  let isFixed = false;
+  let scrollTop = 0;
+  const parents = Dom.of(element).parents();
+  let fixParents = [];
+  // 若父元素存在position === 'fixed' 计算并减去scrollTop
+  for (let index = parents.length - 1; index > -1; index -= 1) {
+    const parent = parents[index];
+    if (Dom.of(parent).css('position') === 'fixed') {
+      isFixed = true;
+      fixParents = parents.slice(0, index);
+      break;
     }
   }
+  if (isFixed) {
+    fixParents.forEach((fixParent) => {
+      scrollTop += fixParent.scrollTop;
+    });
+  }
+  // offsetTop
+  let offsetElement = element;
+  let offsetTop = 0;
+  while (Dom.isElement(offsetElement) && offsetElement.tagName !== 'body' && offsetElement.tagName !== 'html') {
+    offsetTop += offsetElement.offsetTop;
+    offsetElement = offsetElement.offsetParent;
+  }
+  result = offsetTop - scrollTop;
   return result;
 };
 
 const getResponsiveTop = (element, reference) => {
   // 或许响应式的top，如果下方空间不够且上方空间够则在上方，否则在下方
-  if (!dom.isElement(element) || !dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
-  const topSpace = getFixedTop(reference);
+  if (!Dom.isElement(element) || !Dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
+  const topSpace = absolute.y;
   const topSeen = topSpace - window.scrollY;
   const toSeenBottomHeight = window.scrollY + window.innerHeight;
   const toInputBottomHeight = topSpace + reference.offsetHeight;
@@ -55,13 +92,13 @@ const getResponsiveTop = (element, reference) => {
 
 const getResponsiveLeft = (element, reference) => {
   // 或许响应式的left，一般时对齐左边线，只有右侧空间不足时右边线对齐
-  if (!dom.isElement(element) || !dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
-  const leftSpace = getFixedLeft(reference);
+  if (!Dom.isElement(element) || !Dom.isElement(reference)) throw new TypeError('参数应是HTML Element');
+  const leftSpace = absolute.x;
   const rightSpace = document.body.offsetWidth - reference.offsetWidth - leftSpace;
-  const isRightEnough = (rightSpace + reference.offsetWidth) > element.offsetWidth;
+  const isRightEnough = (rightSpace + reference.offsetWidth) > (element.offsetWidth + 20);
   const left = (isRightEnough)
     ? leftSpace
-    : ((leftSpace + reference.offsetWidth) - element.offsetWidth);
+    : leftSpace - element.offsetWidth; // + reference.offsetWidth;
   return left;
 };
 
@@ -81,13 +118,13 @@ const bindWindowResize = () => {
 };
 
 const theadTop = () => {
-  const result = dom.of('<tr>');
-  const prevMonth = dom.of('<th>').text('◂').addClass('prev-month');
-  const th = dom.of('<th>');
-  const nextMonth = dom.of('<th>').text('▸').addClass('next-month');
-  const month = dom.of('<th>').attr('colspan', 2).addClass('month');
-  const input = dom.of('<input>').attr('type', 'number').addClass('year');
-  const thInput = dom.of('<th>').attr('colspan', 2).append(input);
+  const result = Dom.of('<tr>');
+  const prevMonth = Dom.of('<th>').addClass('prev-month').text('◂');
+  const th = Dom.of('<th>');
+  const nextMonth = Dom.of('<th>').addClass('next-month').text('▸');
+  const month = Dom.of('<th>').addClass('month').attr('colspan', 2);
+  const input = Dom.of('<input>').addClass('year').attr('type', 'number');
+  const thInput = Dom.of('<th>').append(input).attr('colspan', 2);
   const children = [prevMonth, th, thInput, month, nextMonth];
   children.forEach((child) => {
     result.append(child);
@@ -96,15 +133,15 @@ const theadTop = () => {
 };
 
 const theadBottom = () => {
-  const result = dom.of('<tr>').addClass('week-sign');
+  const result = Dom.of('<tr>').addClass('week-sign');
   const weekDay = [
-    dom.of('<th>').text('日').addClass('text-red'),
-    dom.of('<th>').text('一'),
-    dom.of('<th>').text('二'),
-    dom.of('<th>').text('三'),
-    dom.of('<th>').text('四'),
-    dom.of('<th>').text('五'),
-    dom.of('<th>').text('六').addClass('text-red'),
+    Dom.of('<th>').text('日').addClass('text-red'),
+    Dom.of('<th>').text('一'),
+    Dom.of('<th>').text('二'),
+    Dom.of('<th>').text('三'),
+    Dom.of('<th>').text('四'),
+    Dom.of('<th>').text('五'),
+    Dom.of('<th>').text('六').addClass('text-red'),
   ];
   weekDay.forEach((day) => {
     result.append(day);
@@ -113,9 +150,9 @@ const theadBottom = () => {
 };
 
 const tdWeek = () => {
-  const result = dom.of('<tr>').addClass('week');
+  const result = Dom.of('<tr>').addClass('week');
   for (let i = 0; i < 7; i += 1) {
-    const td = dom.of('<td>');
+    const td = Dom.of('<td>');
     result.append(td);
   }
   return result;
@@ -123,12 +160,12 @@ const tdWeek = () => {
 
 const pickerElement = () => {
   // html元素拼接结果
-  const result = dom.of('<div>').addClass('datepicker hide');
-  const table = dom.of('<table>').attr('border', 1).attr('cellspacing', 2);
+  const result = Dom.of('<div>').addClass('datepicker hide');
+  const table = Dom.of('<table>').attr('border', 1).attr('cellspacing', 2);
   const thtop = theadTop();
   const thbottom = theadBottom();
-  const thead = dom.of('<thead>').append(thtop).append(thbottom);
-  const tbody = dom.of('<tbody>');
+  const thead = Dom.of('<thead>').append(thtop).append(thbottom);
+  const tbody = Dom.of('<tbody>');
   for (let i = 0; i < 6; i += 1) {
     const week = tdWeek();
     tbody.append(week);
@@ -263,11 +300,13 @@ class Picker {
   bindTurnOn() {
     // 点击输入框打开日期选择器
     this.input.addEventListener('mousedown', (event) => {
+      absolute.x = getFixedLeft(this.input);
+      absolute.y = getFixedTop(this.input);
       event.stopPropagation();
-      dom.of(this.body).removeClass('arrow-top arrow-bottom reel hide'); // 先显示才有宽高
+      Dom.of(this.body).removeClass('arrow-top arrow-bottom reel hide'); // 先显示才有宽高
       const datepickers = document.querySelectorAll('.datepicker');
-      const topSpace = getFixedTop(this.input);
-      const leftSpace = getFixedLeft(this.input);
+      const topSpace = absolute.y;
+      const leftSpace = absolute.x;
       const top = getResponsiveTop(this.body, this.input);
       const left = getResponsiveLeft(this.body, this.input);
       const yclass = (top < topSpace) ? 'arrow-bottom' : 'arrow-top';
@@ -276,7 +315,7 @@ class Picker {
         if (!this.body.isSameNode(picker)) picker.classList.add('hide');
       });
       this.fillDayPickerByCurrent();
-      dom.of(this.body).addClass(`reel ${yclass} ${xclass}`);
+      Dom.of(this.body).addClass(`reel ${yclass} ${xclass}`);
       this.body.style.top = `${top}px`;
       this.body.style.left = `${left}px`;
     });
@@ -290,7 +329,7 @@ class Picker {
       const touchElement = e.target;
       const datepickers = document.querySelectorAll('.datepicker');
       datepickers.forEach((picker) => {
-        const isTouching = dom.of(touchElement).hasParent(picker);
+        const isTouching = Dom.of(touchElement).hasParent(picker);
         if (!isTouching) picker.classList.add('hide');
       });
     });
