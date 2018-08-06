@@ -98,7 +98,7 @@ const getResponsiveLeft = (element, reference) => {
   const isRightEnough = (rightSpace + reference.offsetWidth) > (element.offsetWidth + 20);
   const left = (isRightEnough)
     ? leftSpace
-    : leftSpace - element.offsetWidth; // + reference.offsetWidth;
+    : (leftSpace + reference.offsetWidth) - element.offsetWidth;
   return left;
 };
 
